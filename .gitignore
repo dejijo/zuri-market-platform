@@ -1,3 +1,5 @@
-
 # Local environment variables and secrets
 .env
+
+# Generated health-check logs
+logs/
