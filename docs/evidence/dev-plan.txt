@@ -1,0 +1,24 @@
+var.admin_cidr
+  Public IPv4 CIDR allowed to SSH to the development node
+
+  Enter a value: 
+module.network.data.aws_vpc.selected: Reading...
+data.aws_iam_policy_document.ec2_assume_role: Reading...
+module.security_groups.aws_security_group.this: Refreshing state... [id=sg-05026cb3aa82d3fc6]
+data.aws_iam_policy_document.ec2_assume_role: Read complete after 0s [id=2851119427]
+aws_iam_role.kubernetes_node_ssm: Refreshing state... [id=zuri-market-dev-kubernetes-ssm]
+module.network.data.aws_vpc.selected: Read complete after 0s [id=vpc-05e6d35fc5619d514]
+module.network.data.aws_subnets.selected: Reading...
+module.network.data.aws_subnets.selected: Read complete after 0s [id=eu-west-2]
+aws_iam_role_policy_attachment.ssm_managed_instance_core: Refreshing state... [id=zuri-market-dev-kubernetes-ssm-20261029045624784200000001]
+aws_iam_instance_profile.kubernetes_node: Refreshing state... [id=zuri-market-dev-kubernetes-profile]
+
+Planning failed. Terraform encountered an error while generating this plan.
+
+
+Error: "q" is not a valid CIDR block: invalid CIDR address: q
+
+  with module.security_groups.aws_security_group.this,
+  on ../../modules/security-groups/main.tf line 1, in resource "aws_security_group" "this":
+   1: resource "aws_security_group" "this" {
+
