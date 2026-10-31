@@ -1,0 +1,3 @@
+NAME                              IMAGE                      COMMAND                  SERVICE    CREATED          STATUS          PORTS
+zuri-market-platform-backend-1    zuri-market-backend:dev    "docker-entrypoint.s…"   backend    16 minutes ago   Up 15 minutes   0.0.0.0:5001->5000/tcp, [::]:5001->5000/tcp
+zuri-market-platform-frontend-1   zuri-market-frontend:dev   "/docker-entrypoint.…"   frontend   3 days ago       Up 2 days       0.0.0.0:8081->80/tcp, [::]:8081->80/tcp

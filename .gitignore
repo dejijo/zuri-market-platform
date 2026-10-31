@@ -3,3 +3,25 @@
 
 # Generated health-check logs
 logs/
+
+# Terraform state and sensitive local files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+terraform-state-backup.json
+.terraform/
+*.tfplan
+*.tfvars
+!*.tfvars.example
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Terraform CLI local data
+.terraformrc
+terraform.rc
+
+# Private keys and local credentials
+*.pem
+*.key
+.aws/
