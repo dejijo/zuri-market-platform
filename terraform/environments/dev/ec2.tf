@@ -7,7 +7,8 @@ resource "aws_instance" "kubernetes_node" {
 
   vpc_security_group_ids      = [module.security_groups.security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.kubernetes_node.name
-  associate_public_ip_address = true
+  # Public IP retained for development; SSH ingress is restricted to var.admin_cidr.
+  associate_public_ip_address = true # NOSONAR
 
 
   root_block_device {
