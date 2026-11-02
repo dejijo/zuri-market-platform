@@ -92,6 +92,14 @@ spec:
           ports:
             - name: http-metrics
               containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+              ephemeral-storage: 512Mi
 ---
 apiVersion: v1
 kind: Service
