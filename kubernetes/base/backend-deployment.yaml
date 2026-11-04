@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: zuri-market
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: dejijo/zuriapp-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: backend-config
+          env:
+            - name: API_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: zuri-backend-secret
+                  key: API_SECRET_KEY
+          readinessProbe:
+            httpGet:
+              path: /api/store
+              port: 5000
+          livenessProbe:
+            httpGet:
+              path: /api/store
+              port: 5000
