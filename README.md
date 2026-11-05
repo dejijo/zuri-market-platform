@@ -1,210 +1,513 @@
-# Zuri Market DevOps Capstone
+# Zuri Market Platform – DevOps Capstone Project
 
-## Project Overview
+## 1. Project Overview
 
-# Zuri Market DevOps Capstone
+Zuri Market is a cloud-native application deployed using modern DevOps practices. The project demonstrates the implementation of containerisation, infrastructure automation, Kubernetes orchestration, continuous integration and deployment, application monitoring, and cloud infrastructure management.
 
-## Project Overview
+The platform consists of a frontend web application and a backend API, deployed on an AWS EC2-hosted Kubernetes cluster.
 
-This project implements DevOps practices for the Zuri Market frontend and backend applications. It demonstrates infrastructure provisioning, containerisation, CI/CD automation, security analysis, Kubernetes infrastructure and monitoring.
+The primary objective is to establish a scalable, maintainable, observable, and reliable application deployment environment using industry-standard DevOps tools and practices.
 
-The project is organised into three repositories:
+## 2. Project Architecture
 
-- `zuriapp-frontend` – React frontend application.
-- `zuriapp-backend` – Backend application.
-- `zuri-market-platform` – Infrastructure, Kubernetes manifests, monitoring, automation and project documentation.
+The implementation follows this deployment architecture:
 
-## Objectives
+```text
+                    Developer
+                        |
+                        v
+                  GitHub Repository
+                        |
+                        v
+                 CI/CD Workflow
+                        |
+              +---------+---------+
+              |                   |
+         Code Quality         Build and
+          Analysis            Deployment
+              |                   |
+              v                   v
+           SonarQube         Docker Images
+                                  |
+                                  v
+                           Kubernetes Cluster
+                            (AWS EC2 / Ubuntu)
+                                  |
+                         NGINX Ingress Controller
+                                  |
+                     +------------+------------+
+                     |                         |
+                     v                         v
+                Frontend Service          Backend Service
+                     |                         |
+                     v                         v
+                Frontend Pod              Backend Pod
+                                               |
+                                               v
+                                         API Secret
+                                               |
+                                               v
+                                      Kubernetes Secret
 
-- Containerise the frontend and backend applications using Docker.
-- Automate testing and builds using GitHub Actions.
-- Provision AWS infrastructure using Terraform.
-- Publish Docker images to Docker Hub.
-- Use SonarQube Cloud for code quality analysis.
-- Manage Kubernetes infrastructure using kubeadm.
-- Monitor infrastructure using Prometheus and Grafana.
-- Automate application health checks using Bash and cron.
-- Apply security and infrastructure best practices.
+                  Monitoring Infrastructure
+                           |
+                           v
+                       Prometheus
+                           |
+              +------------+-------------+
+              |            |             |
+              v            v             v
+          Node Exporter  Kube State    Application
+                         Metrics       Metrics
+              |            |             |
+              +------------+-------------+
+                           |
+                           v
+                         Grafana
+                           |
+                           v
+                   Monitoring Dashboards
+```
 
-## Technology Stack
+*Note: The architecture illustrates the intended CI/CD and security integrations. SonarQube's actual CI execution and AWS Secrets Manager synchronisation must be verified separately.*
+
+## 3. Technology Stack
 
 | Area | Technology |
 |---|---|
-| Frontend | React, Vite |
-| Containerisation | Docker |
-| CI/CD | GitHub Actions |
+| Source code management | Git and GitHub |
+| Cloud infrastructure | AWS EC2 |
+| Operating system | Ubuntu Server 24.04 |
 | Infrastructure as Code | Terraform |
-| Cloud | AWS EC2 |
-| Container Registry | Docker Hub |
-| Code Quality | SonarQube Cloud |
-| Orchestration | Kubernetes (kubeadm) |
-| Monitoring | Prometheus, Grafana |
-| Metrics Collection | Node Exporter, kube-state-metrics |
-| Automation | Bash, cron |
+| Containerisation | Docker |
+| Container orchestration | Kubernetes |
+| Kubernetes installation | kubeadm |
+| Ingress management | NGINX Ingress Controller |
+| Application monitoring | Prometheus |
+| Monitoring visualisation | Grafana |
+| Kubernetes metrics | Kube State Metrics |
+| Host monitoring | Node Exporter |
+| Code quality analysis | SonarQube |
+| Secret management | Kubernetes Secrets / AWS Secrets Manager |
+| Automation | GitHub Actions |
 
-## Project Structure
+## 4. Application Components
 
-```text
-zuri-market-platform/
-├── .github/
-│   └── workflows/
-├── docs/
-├── kubernetes/
-├── monitoring/
-├── scripts/
-├── terraform/
-├── compose.yaml
-├── .gitignore
-└── README.md
-```
+The platform is separated into two application components.
 
-The frontend and backend applications are maintained in their own repositories.
+### Frontend
 
-## CI/CD Pipeline
+The frontend provides the Zuri Market web interface and is deployed as a Kubernetes Deployment.
 
-GitHub Actions is used to automate application workflows.
+- Docker containerisation.
+- Kubernetes Deployment and Service.
+- NGINX-based web serving.
+- External access through the Kubernetes Ingress Controller.
 
-The implemented workflows cover:
+### Backend
 
-- Frontend continuous integration.
-- Backend continuous integration.
-- Docker image building and publishing.
-- Docker Hub authentication using GitHub repository secrets.
-- SonarQube Cloud analysis.
+The backend provides the application API.
 
-Docker Hub images:
+- Node.js application.
+- Docker containerisation.
+- Kubernetes Deployment and Service.
+- Runs on container port 5000.
+- Uses environment variables for application configuration.
+- Uses a Kubernetes Secret for `API_SECRET_KEY`.
 
-- Frontend: https://hub.docker.com/r/dejijo/zuriapp-frontend
-- Backend: https://hub.docker.com/r/dejijo/zuriapp-backend
-
-Images are published using the `latest` tag and commit-specific tags where configured.
-
-## Code Quality and Security
-
-SonarQube Cloud is used to analyse application code and report code quality information.
-
-Project dashboard: https://sonarcloud.io/
-
-The analysis is part of the project's code quality workflow. Quality Gate enforcement and coverage reporting should be verified separately before being described as enforced pipeline requirements.
-
-## Infrastructure and Kubernetes
-
-The infrastructure work uses Terraform and AWS EC2.
-
-A self-managed Kubernetes cluster was configured using kubeadm rather than Amazon EKS.
-
-The cluster provides the infrastructure for running Kubernetes workloads and monitoring components.
-
-**Current deployment distinction:** The monitoring stack is running in the EC2 Kubernetes cluster. The Zuri Market frontend and backend have not yet been deployed into that cluster.
-
-## Monitoring
-
-Prometheus and Grafana are deployed in the Kubernetes `monitoring` namespace.
-
-The monitoring stack includes:
-
-- **Prometheus:** Collects and stores metrics.
-- **Grafana:** Provides dashboards and visualisation.
-- **Node Exporter:** Exposes host-level metrics.
-- **kube-state-metrics:** Exposes Kubernetes object and resource-state metrics.
-
-Grafana uses Prometheus as its data source.
-
-Prometheus service address inside the cluster:
+The backend API includes the store information endpoint:
 
 ```text
-http://prometheus.monitoring.svc.cluster.local:9090
+/api/store
 ```
 
-### Local access
+Example response:
 
-The following local endpoints are used when the relevant services, port-forwards and SSH tunnels are running:
-
-| Service | Local URL |
-|---|---|
-| Frontend | http://localhost:8081 |
-| Backend | http://localhost:5001 |
-| Grafana | http://localhost:3001 |
-| Prometheus | http://localhost:9090 |
-
-Grafana and Prometheus access depends on Kubernetes port-forwarding and SSH tunnels. These localhost addresses are not public deployment URLs.
-
-## Useful Kubernetes Commands
-
-Check cluster nodes:
-
-```bash
-kubectl get nodes
+```json
+{
+  "name": "Zuri Market",
+  "totalProducts": 8
+}
 ```
 
-List pods across namespaces:
+## 5. Containerisation
 
-```bash
-kubectl get pods -A
+Docker is used to package the frontend and backend applications into deployable container images.
+
+The configured Docker Hub image repositories are:
+
+- `dejijo/zuriapp-frontend`
+- `dejijo/zuriapp-backend`
+
+The Docker Compose configuration supports local development and application testing.
+
+The backend uses environment-based configuration, including:
+
+- `PORT`
+- `STORE_NAME`
+- `API_SECRET_KEY`
+
+Sensitive configuration values should not be committed to source control.
+
+## 6. Cloud Infrastructure and Kubernetes Deployment
+
+The application is deployed to an AWS EC2 Ubuntu server running a Kubernetes cluster installed using kubeadm.
+
+The cluster hosts the Zuri Market application and monitoring infrastructure.
+
+### Kubernetes resources
+
+The application manifests are maintained under:
+
+```text
+kubernetes/
+└── base/
+    ├── namespace.yaml
+    ├── backend-configmap.yaml
+    ├── backend-deployment.yaml
+    ├── backend-service.yaml
+    ├── frontend-deployment.yaml
+    ├── frontend-service.yaml
+    ├── ingress.yaml
+    └── kustomization.yaml
 ```
 
-List monitoring resources:
+### Kubernetes namespace
 
-```bash
-kubectl get all -n monitoring
+The application runs in:
+
+```text
+zuri-market
 ```
 
-Check deployments:
+### Deployment management
+
+Kustomize is used to organise and deploy the Kubernetes resources.
+
+Example deployment command:
 
 ```bash
-kubectl get deployments -A
+kubectl apply -k kubernetes/base/
+```
+
+Check application resources:
+
+```bash
+kubectl get pods -n zuri-market
 ```
 
 Check services:
 
 ```bash
-kubectl get svc -A
+kubectl get svc -n zuri-market
 ```
 
-View Prometheus logs:
+Check ingress:
 
 ```bash
-kubectl logs -n monitoring deployment/prometheus
+kubectl get ingress -n zuri-market
 ```
 
-View Grafana logs:
+### Application routing
+
+The NGINX Ingress Controller routes requests as follows:
+
+| URL path | Destination |
+|---|---|
+| `/` | Frontend Service |
+| `/api` | Backend Service, port 5000 |
+
+The application was verified as externally accessible using the EC2 public IP and the HTTP Ingress NodePort.
+
+## 7. Secrets Management
+
+The backend requires an API secret to operate securely.
+
+A Kubernetes Secret named:
+
+```text
+zuri-backend-secret
+```
+
+is configured in the `zuri-market` namespace.
+
+The backend Deployment references the following key:
+
+```text
+API_SECRET_KEY
+```
+
+AWS Secrets Manager is being used as the cloud-based secret-management solution.
+
+The intended integration is to securely retrieve secrets from AWS Secrets Manager and make them available to Kubernetes workloads without storing sensitive values in GitHub.
+
+**Security considerations:**
+
+- Never commit API secrets, passwords or AWS credentials.
+- Use IAM permissions with least privilege.
+- Restrict access to Kubernetes Secrets.
+- Avoid printing secret values in CI/CD logs.
+- Rotate credentials periodically.
+
+The AWS Secrets Manager-to-Kubernetes synchronisation should be verified before considering this integration complete.
+
+## 8. Monitoring and Observability
+
+Prometheus and Grafana are deployed in the Kubernetes cluster under the:
+
+```text
+monitoring
+```
+
+namespace.
+
+### Prometheus
+
+Prometheus collects infrastructure and Kubernetes metrics.
+
+The configured monitoring components include:
+
+- Node Exporter.
+- Kube State Metrics.
+- Prometheus.
+
+The Prometheus service is accessible internally at:
+
+```text
+http://prometheus.monitoring.svc.cluster.local:9090
+```
+
+### Grafana
+
+Grafana provides dashboards and visualisation of the metrics collected by Prometheus.
+
+The Grafana service is available internally at:
+
+```text
+http://grafana.monitoring.svc.cluster.local:3000
+```
+
+Existing dashboards include:
+
+- Kubernetes Kube State Metrics dashboard.
+- Node Exporter Full dashboard.
+
+### Monitoring verification
+
+The Prometheus connectivity check was successfully completed using:
+
+```promql
+up
+```
+
+The following monitoring targets were confirmed UP:
+
+- Prometheus.
+- Node Exporter.
+- Kube State Metrics.
+
+Kubernetes workload discovery was also verified using:
+
+```promql
+kube_pod_info
+```
+
+The Zuri Market frontend and backend pods were successfully identified using:
+
+```promql
+kube_pod_info{namespace="zuri-market"}
+```
+
+This confirms that Prometheus can discover the application workloads.
+
+Further work includes completing application-specific CPU and memory panels and validating the relevant container resource metrics.
+
+## 9. Continuous Integration and Code Quality
+
+GitHub Actions is used as the automation platform for the project's CI/CD implementation.
+
+The intended workflow includes:
+
+1. Source code checkout.
+2. Dependency installation.
+3. Application validation and testing.
+4. Code quality analysis.
+5. Docker image build.
+6. Container image publication.
+7. Deployment to the Kubernetes environment.
+
+### SonarQube
+
+SonarQube is the selected code quality and static analysis platform.
+
+It is intended to analyse application source code and identify:
+
+- Bugs.
+- Code smells.
+- Security vulnerabilities.
+- Maintainability issues.
+- Code quality problems.
+
+The SonarQube CI integration must be validated by confirming that the GitHub Actions workflow executes the analysis and that a successful pipeline publishes its results to the SonarQube server.
+
+## 10. Repository Structure
+
+The main repository contains the infrastructure and Kubernetes deployment configuration.
+
+```text
+zuri-market-platform/
+│
+├── .github/
+│   └── workflows/
+│       └── CI/CD workflow files
+│
+├── kubernetes/
+│   └── base/
+│       ├── namespace.yaml
+│       ├── backend-configmap.yaml
+│       ├── backend-deployment.yaml
+│       ├── backend-service.yaml
+│       ├── frontend-deployment.yaml
+│       ├── frontend-service.yaml
+│       ├── ingress.yaml
+│       └── kustomization.yaml
+│
+├── monitoring/
+│   └── Monitoring configuration files
+│
+├── terraform/
+│   └── Infrastructure as Code files
+│
+├── docker-compose.yml
+├── .gitignore
+└── README.md
+```
+
+The frontend and backend application source code are maintained in separate repositories:
+
+- Frontend: `zuriapp-frontend`
+- Backend: `zuriapp-backend`
+
+Directory names may differ slightly depending on the latest repository changes.
+
+## 11. Deployment and Verification
+
+### Verify Kubernetes workloads
 
 ```bash
-kubectl logs -n monitoring deployment/grafana
+kubectl get pods -n zuri-market
 ```
 
-## Application Access
+### Verify monitoring workloads
 
-The frontend and backend are developed and run separately from the EC2 Kubernetes monitoring cluster.
+```bash
+kubectl get pods -n monitoring
+```
 
-- Frontend: `http://localhost:8081`
-- Backend: `http://localhost:5001`
+### Verify Prometheus targets
 
-These endpoints depend on the applications being started locally and are intended for local development and testing.
+Open the Prometheus interface and execute:
 
-## Automation
+```promql
+up
+```
 
-The project includes a `scripts/` directory for operational automation.
+All expected monitoring targets should return a value of `1`.
 
-Bash and cron are intended to support scheduled health checks and other routine operational tasks. The final scheduled execution and evidence should be verified before marking this objective fully complete.
+### Verify application API
 
-## Current Project Status
+```bash
+curl http://<EC2-PUBLIC-IP>:<INGRESS-HTTP-NODEPORT>/api/store
+```
 
-### Completed work
+### Verify frontend
 
-- [x] Repository structure established.
-- [x] Frontend and backend CI workflows implemented.
-- [x] Docker images built and published to Docker Hub.
-- [x] SonarQube Cloud analysis completed.
-- [x] AWS EC2 Kubernetes infrastructure configured.
-- [x] Prometheus deployed.
-- [x] Grafana deployed and connected to Prometheus.
-- [x] Node Exporter deployed.
-- [x] kube-state-metrics deployed.
-- [x] Node Exporter Full dashboard imported into Grafana.
+Open the following address in a web browser:
 
-## Conclusion
+```text
+http://<EC2-PUBLIC-IP>:<INGRESS-HTTP-NODEPORT>/
+```
 
-The Zuri Market DevOps Capstone demonstrates the use of modern DevOps tools and practices across application development, CI/CD, infrastructure provisioning, containerisation, code quality analysis and infrastructure monitoring.
+### Access Grafana securely
 
-The project establishes a foundation for completing automated application deployment and end-to-end monitoring on Kubernetes.
+Grafana is exposed internally through a ClusterIP service. It can be accessed using Kubernetes port forwarding:
+
+```bash
+kubectl port-forward -n monitoring svc/grafana 3000:3000
+```
+
+Then create an SSH tunnel from your local machine:
+
+```bash
+ssh -i ~/.ssh/zuri-market-key \
+-L 3000:localhost:3000 \
+ubuntu@<EC2-PUBLIC-IP>
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+## 12. Security and Best Practices
+
+The project follows several security principles:
+
+- Application secrets are not intended to be stored in source control.
+- Kubernetes Secrets are used for backend configuration.
+- AWS IAM permissions should follow least-privilege principles.
+- Grafana is accessed through an SSH tunnel rather than an unrestricted public endpoint.
+- Containerised applications run using their configured container security settings.
+- Infrastructure and application configuration are maintained separately.
+- CI/CD credentials should be stored as protected GitHub Actions secrets.
+
+## 13. Project Implementation Achievements
+
+The following implementation activities have been completed and verified during deployment:
+
+- Frontend and backend application containerisation.
+- AWS EC2 Ubuntu environment provisioning.
+- Kubernetes cluster deployment using kubeadm.
+- Kubernetes application namespace creation.
+- Frontend and backend Kubernetes Deployments.
+- Kubernetes Services for application communication.
+- NGINX Ingress Controller installation and routing.
+- External frontend access through the EC2 public IP.
+- Successful backend API response through the Ingress endpoint.
+- Kubernetes Secret creation for backend API configuration.
+- Prometheus deployment and successful API connectivity.
+- Grafana deployment and Prometheus data source configuration.
+- Successful Prometheus target health checks.
+- Kubernetes pod discovery through Kube State Metrics.
+- Grafana dashboard availability.
+
+## 14. Further Improvements and Outstanding Validation
+
+The following activities are important for completing and strengthening the project:
+
+- Validate SonarQube analysis within the GitHub Actions CI workflow.
+- Complete AWS Secrets Manager integration with Kubernetes.
+- Complete application-specific CPU and memory monitoring.
+- Develop a dedicated Zuri Market Grafana dashboard.
+- Configure monitoring alerts for unhealthy pods and infrastructure.
+- Validate automated Docker image publication and deployment.
+- Review Terraform provisioning and infrastructure state.
+- Document backup, recovery and disaster recovery procedures.
+- Configure production-grade HTTPS and domain-based access.
+
+## 15. Conclusion
+
+The Zuri Market DevOps Capstone demonstrates the practical application of cloud infrastructure, containerisation, Kubernetes orchestration, continuous integration, security and observability.
+
+The deployment establishes a working cloud-hosted application with externally accessible frontend and backend services, Kubernetes workload management, and a functioning Prometheus-Grafana monitoring stack.
+
+The project provides a foundation for further improvements in automated delivery, infrastructure reproducibility, security integration and production-grade monitoring.
+
+---
+
+**Repository:** [dejijo/zuri-market-platform](https://github.com/dejijo/zuri-market-platform)
+
+**Active development branch:** `feature/terraform-infrastructure`
+
+**Project:** Zuri Market DevOps Capstone
