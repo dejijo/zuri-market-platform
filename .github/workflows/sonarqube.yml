@@ -1,0 +1,35 @@
+name: SonarQube Cloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - feature/terraform-infrastructure
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  sonarqube:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SonarQube Cloud Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=dejijo
+            -Dsonar.projectKey=dejijo_zuri-market-platform
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/.git/**,**/node_modules/**,**/vendor/**,**/dist/**,**/build/**,**/.terraform/**
