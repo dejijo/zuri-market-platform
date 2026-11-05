@@ -482,19 +482,7 @@ The following implementation activities have been completed and verified during 
 - Kubernetes pod discovery through Kube State Metrics.
 - Grafana dashboard availability.
 
-## 14. Further Improvements and Outstanding Validation
 
-The following activities are important for completing and strengthening the project:
-
-- Validate SonarQube analysis within the GitHub Actions CI workflow.
-- Complete AWS Secrets Manager integration with Kubernetes.
-- Complete application-specific CPU and memory monitoring.
-- Develop a dedicated Zuri Market Grafana dashboard.
-- Configure monitoring alerts for unhealthy pods and infrastructure.
-- Validate automated Docker image publication and deployment.
-- Review Terraform provisioning and infrastructure state.
-- Document backup, recovery and disaster recovery procedures.
-- Configure production-grade HTTPS and domain-based access.
 
 ## 15. Conclusion
 
